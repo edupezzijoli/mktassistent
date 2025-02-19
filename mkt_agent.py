@@ -132,9 +132,11 @@ if meta_ads_df is not None and google_ads_df is not None:
 
         }
             
-                # Adicionar o cálculo da taxa de conversão dos últimos 7 dias
-        taxa_ultimos_7_dias, taxa_periodo_anterior, status_conversao = conversion_rate_last_7_days(df)
-
+        # Calcular a taxa de conversão dos últimos 7 dias para Meta Ads
+        taxa_meta_ultimos_7_dias, taxa_meta_periodo_anterior, status_meta = conversion_rate_last_7_days(meta_ads_df, "Meta Ads")
+        
+        # Calcular a taxa de conversão dos últimos 7 dias para Google Ads
+        taxa_google_ultimos_7_dias, taxa_google_periodo_anterior, status_google = conversion_rate_last_7_days(google_ads_df, "Google Ads")
 
         st.subheader("🔢 Análise da Performance ")
 
@@ -143,7 +145,8 @@ if meta_ads_df is not None and google_ads_df is not None:
             st.metric("Taxa de Conversão", f"{results['taxa_conversao']:.2%}")
             st.metric("Maior Faturamento", f"🗓️ {results['dia_maior_faturamento']} (R$ {results['maior_faturamento']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') + ")")
             st.metric("Faturamento Total", f"💵 R$ {results['faturamento_total']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'))
-            st.metric("Conversão 7 Dias (compras/carrinhos)", f"{taxa_ultimos_7_dias:.2%} (vs {taxa_periodo_anterior:.2%})", status_conversao)
+            st.metric("Conversão 7 Dias (Meta Ads)", f"{taxa_meta_ultimos_7_dias:.2%} (vs {taxa_meta_periodo_anterior:.2%})", status_meta)
+            st.metric("Conversão 7 Dias (Google Ads)", f"{taxa_google_ultimos_7_dias:.2%} (vs {taxa_google_periodo_anterior:.2%})", status_google)
         with col2:
             st.metric("ROAS", f"{results['roas_total']:.2f}")
             st.metric("Maior Ticket Médio", f"🗓️ {results['dia_maior_ticket_medio']} (R$ {results['maior_ticket_medio']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') + ")")
