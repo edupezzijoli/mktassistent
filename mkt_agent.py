@@ -108,11 +108,7 @@ if meta_ads_df is not None and google_ads_df is not None:
     data_fim = st.sidebar.date_input("Data de Fim", df['Data'].max().date())
     
     df = df[(df['Data'] >= pd.to_datetime(data_inicio)) & (df['Data'] <= pd.to_datetime(data_fim))]
-
-    # Adicionar o cálculo da taxa de conversão dos últimos 7 dias
-    taxa_ultimos_7_dias, taxa_periodo_anterior, status_conversao = conversion_rate_last_7_days(df)
-
-
+    
     if df.empty:
         st.warning("Nenhum dado disponível para o período selecionado.")
     else:
@@ -128,10 +124,8 @@ if meta_ads_df is not None and google_ads_df is not None:
             'roas_total': investment_roas(df)[1],
             'dia_menor_cac': lowest_cac_day(df)[0],
             'menor_cac': lowest_cac_day(df)[1],
-            'taxa_conversao': conversion_rate(df, plataforma),
-
         }
-            
+
         # Calcular a taxa de conversão dos últimos 7 dias para Meta Ads
         taxa_meta_ultimos_7_dias, taxa_meta_periodo_anterior, status_meta = conversion_rate_last_7_days(meta_ads_df, "Meta Ads")
         
@@ -143,15 +137,19 @@ if meta_ads_df is not None and google_ads_df is not None:
         col1, col2 = st.columns(2)
         with col1:
             st.metric("Taxa de Conversão", f"{results['taxa_conversao']:.2%}")
+            st.metric("Conversão 7 Dias (Meta Ads)", 
+                      f"{taxa_meta_ultimos_7_dias:.2%} (vs {taxa_meta_periodo_anterior:.2%})", 
+                      status_meta)
+            st.metric("Conversão 7 Dias (Google Ads)", 
+                      f"{taxa_google_ultimos_7_dias:.2%} (vs {taxa_google_periodo_anterior:.2%})", 
+                      status_google)
             st.metric("Maior Faturamento", f"🗓️ {results['dia_maior_faturamento']} (R$ {results['maior_faturamento']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') + ")")
             st.metric("Faturamento Total", f"💵 R$ {results['faturamento_total']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'))
-            st.metric("Conversão 7 Dias (Meta Ads)", f"{taxa_meta_ultimos_7_dias:.2%} (vs {taxa_meta_periodo_anterior:.2%})", status_meta)
-            st.metric("Conversão 7 Dias (Google Ads)", f"{taxa_google_ultimos_7_dias:.2%} (vs {taxa_google_periodo_anterior:.2%})", status_google)
+
         with col2:
             st.metric("ROAS", f"{results['roas_total']:.2f}")
             st.metric("Maior Ticket Médio", f"🗓️ {results['dia_maior_ticket_medio']} (R$ {results['maior_ticket_medio']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') + ")")
-            st.metric("Investimento Total", f"💵 R$ {results['investimento_total']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'))
-            
+            st.metric("Investimento Total", f"💵 R$ {results['investimento_total']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'))     
 
     st.markdown("---")  
 
