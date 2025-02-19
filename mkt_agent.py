@@ -72,8 +72,8 @@ def conversion_rate_last_7_days(df, platform):
 
     # Calcular a taxa de conversão de acordo com a plataforma
     if platform == "Meta Ads":
-        taxa_ultimos_7_dias = df_ultimos_7_dias['Compras'].sum() / df_ultimos_7_dias['Carrinhos'].sum() if df_ultimos_7_dias['Carrinhos'].sum() > 0 else 0
-        taxa_periodo_anterior = df_periodo_anterior['Compras'].sum() / df_periodo_anterior['Carrinhos'].sum() if df_periodo_anterior['Carrinhos'].sum() > 0 else 0
+        taxa_ultimos_7_dias = df_ultimos_7_dias['Compras'].sum() / df_ultimos_7_dias['Visualização'].sum() if df_ultimos_7_dias['Visualização'].sum() > 0 else 0
+        taxa_periodo_anterior = df_periodo_anterior['Compras'].sum() / df_periodo_anterior['Visualização'].sum() if df_periodo_anterior['Visualização'].sum() > 0 else 0
     elif platform == "Google Ads":
         taxa_ultimos_7_dias = df_ultimos_7_dias['Compras'].sum() / df_ultimos_7_dias['Impressões'].sum() if df_ultimos_7_dias['Impressões'].sum() > 0 else 0
         taxa_periodo_anterior = df_periodo_anterior['Compras'].sum() / df_periodo_anterior['Impressões'].sum() if df_periodo_anterior['Impressões'].sum() > 0 else 0
