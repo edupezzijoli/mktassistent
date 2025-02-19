@@ -134,17 +134,14 @@ if meta_ads_df is not None and google_ads_df is not None:
         col1, col2 = st.columns(2)
         with col1:
             st.metric("Taxa de Conversão", f"{results['taxa_conversao']:.2%}")
-            st.metric(f"Conversão 7 Dias ({plataforma})", 
-                      f"{taxa_ultimos_7_dias:.2%} (vs {taxa_periodo_anterior:.2%})", 
-                      status_conversao)
             st.metric("Maior Faturamento", f"🗓️ {results['dia_maior_faturamento']} (R$ {results['maior_faturamento']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') + ")")
             st.metric("Faturamento Total", f"💵 R$ {results['faturamento_total']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'))
-
+            st.metric(f"Conversão 7 Dias ({plataforma})", f"{taxa_ultimos_7_dias:.2%} (vs {taxa_periodo_anterior:.2%})", status_conversao)
         with col2:
             st.metric("ROAS", f"{results['roas_total']:.2f}")
             st.metric("Maior Ticket Médio", f"🗓️ {results['dia_maior_ticket_medio']} (R$ {results['maior_ticket_medio']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') + ")")
             st.metric("Investimento Total", f"💵 R$ {results['investimento_total']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'))
-            
+
     st.markdown("---")  
 
     st.subheader("📊 Gráficos de Performance")
