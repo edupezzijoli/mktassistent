@@ -61,16 +61,22 @@ def lowest_cac_day(df):
         return cac_por_dia.idxmin(), cac_por_dia.min()
     return "Nenhum dado", 0
 
-def conversion_rate_last_7_days(df):
+def conversion_rate_last_7_days(df, platform):
     # Últimos 7 dias
     ultimos_7_dias = df['Data'].max() - pd.Timedelta(days=6)
     df_ultimos_7_dias = df[df['Data'] >= ultimos_7_dias]
-    taxa_ultimos_7_dias = df_ultimos_7_dias['Compras'].sum() / df_ultimos_7_dias['Carrinhos'].sum() if df_ultimos_7_dias['Carrinhos'].sum() > 0 else 0
 
     # 7 dias anteriores
     periodo_anterior = ultimos_7_dias - pd.Timedelta(days=7)
     df_periodo_anterior = df[(df['Data'] >= periodo_anterior) & (df['Data'] < ultimos_7_dias)]
-    taxa_periodo_anterior = df_periodo_anterior['Compras'].sum() / df_periodo_anterior['Carrinhos'].sum() if df_periodo_anterior['Carrinhos'].sum() > 0 else 0
+
+    # Calcular a taxa de conversão de acordo com a plataforma
+    if platform == "Meta Ads":
+        taxa_ultimos_7_dias = df_ultimos_7_dias['Compras'].sum() / df_ultimos_7_dias['Carrinhos'].sum() if df_ultimos_7_dias['Carrinhos'].sum() > 0 else 0
+        taxa_periodo_anterior = df_periodo_anterior['Compras'].sum() / df_periodo_anterior['Carrinhos'].sum() if df_periodo_anterior['Carrinhos'].sum() > 0 else 0
+    elif platform == "Google Ads":
+        taxa_ultimos_7_dias = df_ultimos_7_dias['Compras'].sum() / df_ultimos_7_dias['Impressões'].sum() if df_ultimos_7_dias['Impressões'].sum() > 0 else 0
+        taxa_periodo_anterior = df_periodo_anterior['Compras'].sum() / df_periodo_anterior['Impressões'].sum() if df_periodo_anterior['Impressões'].sum() > 0 else 0
 
     # Comparação
     if taxa_ultimos_7_dias > taxa_periodo_anterior:
