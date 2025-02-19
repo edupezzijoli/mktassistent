@@ -151,7 +151,7 @@ st.markdown("---")
 st.subheader("📈 Gráfico Personalizado")
 
 # Seleção das métricas para o gráfico personalizado (agora múltiplas colunas)
-colunas_disponiveis = ['Receita', 'Compras', 'Custo', 'Impressões', 'Carrinhos', 'Finalização de compra']
+colunas_disponiveis = ['Receita', 'Compras', 'Custo', 'Impressões', 'Carrinhos', 'Finalização de compra', 'CPC', 'CPM', 'Visualizações', 'Alcance', 'CAC', 'ROAS']
 colunas_selecionadas = st.multiselect("Selecione as métricas para visualizar no gráfico", colunas_disponiveis, default=['Receita'])
 
 if colunas_selecionadas:
