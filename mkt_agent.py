@@ -145,4 +145,38 @@ if meta_ads_df is not None and google_ads_df is not None:
 
     col4.pyplot(fig)
 
+# -------------------- NOVO GRÁFICO PERSONALIZADO --------------------
+    st.markdown("---")
+    st.subheader("📈 Gráfico Personalizado")
 
+    # Seleção da métrica para o gráfico personalizado
+    colunas_disponiveis = ['Receita', 'Compras', 'Custo', 'Impressões', 'Carrinhos', 'Finalização de compra']
+    coluna_selecionada = st.selectbox("Selecione a métrica para visualizar no gráfico", colunas_disponiveis)
+
+    # Cálculo do maior valor e da média
+    maior_valor = df[coluna_selecionada].max()
+    media_valor = df[coluna_selecionada].mean()
+
+    col5, col6 = st.columns(2)
+    with col5:
+        st.metric(f"📌 Maior valor ({coluna_selecionada})", f"{maior_valor:,.2f}")
+    with col6:
+        st.metric(f"📊 Média ({coluna_selecionada})", f"{media_valor:,.2f}")
+
+    # Criando o gráfico dinâmico abaixo dos outros dois
+    fig, ax = plt.subplots(figsize=(8, 4))
+    df.groupby("Data Simplificada")[coluna_selecionada].sum().plot(kind='line', ax=ax, title=f"{coluna_selecionada} ao longo do tempo", linewidth=0.7)
+
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, fontsize=6)
+    ax.set_xlabel("Data")
+    ax.title.set_size(6) 
+    ax.set_ylabel(coluna_selecionada)
+
+    st.pyplot(fig)
+
+
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, fontsize=4)  # Reduzindo tamanho das legendas do eixo X
+    ax.set_yticklabels(ax.get_yticks(), fontsize=4)  # Reduzindo tamanho das legendas do eixo Y
+    ax.title.set_size(6)  # Reduzindo tamanho do título
+    ax.set_xlabel("")  # Removendo o rótulo do eixo X
+    ax.set_ylabel("")  # Removendo o rótulo do eixo Y
