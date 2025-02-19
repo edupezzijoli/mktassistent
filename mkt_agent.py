@@ -61,7 +61,26 @@ def lowest_cac_day(df):
         return cac_por_dia.idxmin(), cac_por_dia.min()
     return "Nenhum dado", 0
 
+def conversion_rate_last_7_days(df):
+    # Últimos 7 dias
+    ultimos_7_dias = df['Data'].max() - pd.Timedelta(days=6)
+    df_ultimos_7_dias = df[df['Data'] >= ultimos_7_dias]
+    taxa_ultimos_7_dias = df_ultimos_7_dias['Compras'].sum() / df_ultimos_7_dias['Carrinhos'].sum() if df_ultimos_7_dias['Carrinhos'].sum() > 0 else 0
 
+    # 7 dias anteriores
+    periodo_anterior = ultimos_7_dias - pd.Timedelta(days=7)
+    df_periodo_anterior = df[(df['Data'] >= periodo_anterior) & (df['Data'] < ultimos_7_dias)]
+    taxa_periodo_anterior = df_periodo_anterior['Compras'].sum() / df_periodo_anterior['Carrinhos'].sum() if df_periodo_anterior['Carrinhos'].sum() > 0 else 0
+
+    # Comparação
+    if taxa_ultimos_7_dias > taxa_periodo_anterior:
+        status = "🟢 Aumentou"
+    elif taxa_ultimos_7_dias < taxa_periodo_anterior:
+        status = "🔴 Diminuiu"
+    else:
+        status = "🟡 Manteve-se estável"
+
+    return taxa_ultimos_7_dias, taxa_periodo_anterior, status
 
 # Interface Streamlit
 st.set_page_config(layout="wide")
@@ -83,7 +102,11 @@ if meta_ads_df is not None and google_ads_df is not None:
     data_fim = st.sidebar.date_input("Data de Fim", df['Data'].max().date())
     
     df = df[(df['Data'] >= pd.to_datetime(data_inicio)) & (df['Data'] <= pd.to_datetime(data_fim))]
-    
+
+    # Adicionar o cálculo da taxa de conversão dos últimos 7 dias
+    taxa_ultimos_7_dias, taxa_periodo_anterior, status_conversao = conversion_rate_last_7_days(df)
+
+
     if df.empty:
         st.warning("Nenhum dado disponível para o período selecionado.")
     else:
@@ -99,8 +122,14 @@ if meta_ads_df is not None and google_ads_df is not None:
             'roas_total': investment_roas(df)[1],
             'dia_menor_cac': lowest_cac_day(df)[0],
             'menor_cac': lowest_cac_day(df)[1],
+            'taxa_conversao': conversion_rate(df, plataforma),
+
         }
             
+                # Adicionar o cálculo da taxa de conversão dos últimos 7 dias
+        taxa_ultimos_7_dias, taxa_periodo_anterior, status_conversao = conversion_rate_last_7_days(df)
+
+
         st.subheader("🔢 Análise da Performance ")
 
         col1, col2 = st.columns(2)
@@ -108,7 +137,7 @@ if meta_ads_df is not None and google_ads_df is not None:
             st.metric("Taxa de Conversão", f"{results['taxa_conversao']:.2%}")
             st.metric("Maior Faturamento", f"🗓️ {results['dia_maior_faturamento']} (R$ {results['maior_faturamento']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') + ")")
             st.metric("Faturamento Total", f"💵 R$ {results['faturamento_total']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'))
-
+            st.metric("Conversão 7 Dias", f"{taxa_ultimos_7_dias:.2%} (vs {taxa_periodo_anterior:.2%})", status_conversao)
         with col2:
             st.metric("ROAS", f"{results['roas_total']:.2f}")
             st.metric("Maior Ticket Médio", f"🗓️ {results['dia_maior_ticket_medio']} (R$ {results['maior_ticket_medio']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') + ")")
@@ -144,7 +173,6 @@ if meta_ads_df is not None and google_ads_df is not None:
     ax.set_ylabel("")  # Removendo o rótulo do eixo Y
 
     col4.pyplot(fig)
-
 
 # -------------------- NOVO GRÁFICO PERSONALIZADO --------------------
 st.markdown("---")
