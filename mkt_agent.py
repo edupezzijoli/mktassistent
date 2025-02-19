@@ -145,38 +145,40 @@ if meta_ads_df is not None and google_ads_df is not None:
 
     col4.pyplot(fig)
 
+
 # -------------------- NOVO GRÁFICO PERSONALIZADO --------------------
-    st.markdown("---")
-    st.subheader("📈 Gráfico Personalizado")
+st.markdown("---")
+st.subheader("📈 Gráfico Personalizado")
 
-    # Seleção da métrica para o gráfico personalizado
-    colunas_disponiveis = ['Receita', 'Compras', 'Custo', 'Impressões', 'Carrinhos', 'Finalização de compra']
-    coluna_selecionada = st.selectbox("Selecione a métrica para visualizar no gráfico", colunas_disponiveis)
+# Seleção das métricas para o gráfico personalizado (agora múltiplas colunas)
+colunas_disponiveis = ['Receita', 'Compras', 'Custo', 'Impressões', 'Carrinhos', 'Finalização de compra']
+colunas_selecionadas = st.multiselect("Selecione as métricas para visualizar no gráfico", colunas_disponiveis, default=['Receita'])
 
-    # Cálculo do maior valor e da média
-    maior_valor = df[coluna_selecionada].max()
-    media_valor = df[coluna_selecionada].mean()
-
+if colunas_selecionadas:
+    # Cálculo do maior valor e da média para cada métrica selecionada
     col5, col6 = st.columns(2)
     with col5:
-        st.metric(f"📌 Maior valor ({coluna_selecionada})", f"{maior_valor:,.2f}")
-    with col6:
-        st.metric(f"📊 Média ({coluna_selecionada})", f"{media_valor:,.2f}")
+        maiores_valores = {col: df[col].max() for col in colunas_selecionadas}
+        st.write("📌 **Maior Valor por Métrica**")
+        for col, val in maiores_valores.items():
+            st.write(f"**{col}:** {val:,.2f}")
 
-    # Criando o gráfico dinâmico abaixo dos outros dois
+    with col6:
+        medias_valores = {col: df[col].mean() for col in colunas_selecionadas}
+        st.write("📊 **Média por Métrica**")
+        for col, val in medias_valores.items():
+            st.write(f"**{col}:** {val:,.2f}")
+
+    # Criando o gráfico dinâmico para múltiplas colunas
     fig, ax = plt.subplots(figsize=(8, 4))
-    df.groupby("Data Simplificada")[coluna_selecionada].sum().plot(kind='line', ax=ax, title=f"{coluna_selecionada} ao longo do tempo", linewidth=0.7)
+
+    for coluna in colunas_selecionadas:
+        df.groupby("Data Simplificada")[coluna].sum().plot(kind='line', ax=ax, linewidth=1, label=coluna)
 
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, fontsize=6)
     ax.set_xlabel("Data")
-    ax.title.set_size(6) 
-    ax.set_ylabel(coluna_selecionada)
+    ax.set_ylabel("Valores")
+    ax.set_title("Comparação das métricas ao longo do tempo", fontsize=8)
+    ax.legend(fontsize=6)
 
     st.pyplot(fig)
-
-
-    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, fontsize=4)  # Reduzindo tamanho das legendas do eixo X
-    ax.set_yticklabels(ax.get_yticks(), fontsize=4)  # Reduzindo tamanho das legendas do eixo Y
-    ax.title.set_size(6)  # Reduzindo tamanho do título
-    ax.set_xlabel("")  # Removendo o rótulo do eixo X
-    ax.set_ylabel("")  # Removendo o rótulo do eixo Y
